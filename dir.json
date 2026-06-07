@@ -1,0 +1,34 @@
+[
+  {
+    "folderName": "物品异常",
+    "files": []
+  },
+  {
+    "folderName": "生物异常",
+    "files": []
+  },
+  {
+    "folderName": "人形异常",
+    "files": []
+  },
+  {
+    "folderName": "天体异常",
+    "files": []
+  },
+  {
+    "folderName": "气象异常",
+    "files": []
+  },
+  {
+    "folderName": "概念异常",
+    "files": ["MAS-001.txt"]
+  },
+  {
+    "folderName": "人类异常",
+    "files": []
+  },
+  {
+    "folderName": "神性异常",
+    "files": []
+  }
+]
