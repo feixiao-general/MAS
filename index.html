@@ -1,538 +1,167 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MAS 异常档案库</title>
-<style>
-    /* --- 基础黑绿终端风格 --- */
-    :root {
-        --bg-color: #050505;
-        --text-color: #00ff41;
-        --dim-color: #008f11;
-        --accent-color: #003b00;
-        --alert-color: #ff3333;
-    }
-    * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-    }
-    body {
-        margin: 0;
-        padding: 0;
-        background-color: var(--bg-color);
-        color: var(--text-color);
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 14px;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    /* --- 顶部导航 --- */
-    header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px 15px;
-        background: var(--accent-color);
-        border-bottom: 1px solid var(--dim-color);
-        z-index: 10;
-    }
-    .menu-btn {
-        background: none;
-        border: none;
-        color: var(--text-color);
-        font-size: 24px;
-        cursor: pointer;
-    }
-    h1 {
-        margin: 0;
-        font-size: 18px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-    /* --- 侧边栏 --- */
-    #sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 250px;
-        height: 100%;
-        background: #001100;
-        border-right: 1px solid var(--dim-color);
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-        z-index: 20;
-        padding-top: 60px;
-    }
-    #sidebar.active {
-        transform: translateX(0);
-    }
-    .sidebar-item {
-        padding: 15px;
-        display: block;
-        color: var(--dim-color);
-        text-decoration: none;
-        border-bottom: 1px solid #002200;
-    }
-    .sidebar-item.active, .sidebar-item:hover {
-        background: var(--accent-color);
-        color: var(--text-color);
-    }
-    .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        z-index: 15;
-        display: none;
-    }
-    .overlay.active {
-        display: block;
-    }
-    /* --- 主内容区 --- */
-    #main-content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 10px;
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 15px;
-    }
-    .card {
-        border: 1px solid var(--dim-color);
-        padding: 15px;
-        background: #001100;
-        position: relative;
-    }
-    .card h3 {
-        margin-top: 0;
-        color: var(--text-color);
-        border-bottom: 1px dashed var(--dim-color);
-        padding-bottom: 5px;
-    }
-    .card p {
-        margin: 5px 0;
-        font-size: 12px;
-        color: #ccc;
-        word-break: break-all;
-    }
-    .card .tag {
-        display: inline-block;
-        padding: 2px 5px;
-        font-size: 10px;
-        border: 1px solid var(--text-color);
-        margin-top: 5px;
-    }
-    .card-actions {
-        margin-top: 10px;
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-    .btn {
-        background: var(--accent-color);
-        color: var(--text-color);
-        border: none;
-        padding: 5px 10px;
-        font-family: inherit;
-        cursor: pointer;
-        font-size: 12px;
-    }
-    .btn-danger {
-        color: var(--alert-color);
-        border: 1px solid var(--alert-color);
-    }
-    /* --- 编辑 弹窗 --- */
-    .modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 500px;
-        max-height: 90vh;
-        background: #001100;
-        border: 1px solid var(--text-color);
-        padding: 20px;
-        z-index: 25;
-        overflow-y: auto;
-        display: none;
-    }
-    .modal.active {
-        display: block;
-    }
-    .form-group {
-        margin-bottom: 15px;
-    }
-    .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        color: var(--dim-color);
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        width: 100%;
-        padding: 8px;
-        background: #000;
-        border: 1px solid var(--dim-color);
-        color: var(--text-color);
-        font-family: inherit;
-    }
-    .form-group textarea {
-        height: 100px;
-        resize: vertical;
-    }
-    /* --- 全屏编辑模式 --- */
-    #fullEditorModal {
-        width: 100%;
-        height: 100%;
-        max-width: none;
-        max-height: none;
-        transform: none;
-        top: 0;
-        left: 0;
-        padding: 10px;
-        display: none;
-    }
-    #fullEditorModal.active {
-        display: block;
-    }
-    #fullEditorModal textarea {
-        height: 80vh;
-        font-size: 16px;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAS档案库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #000;
+            color: #00ff41;
+            font-family: "Courier New", monospace;
+            padding: 20px;
+            line-height: 1.8;
+        }
+        h1 {
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #00ff41;
+        }
+        .tip {
+            color: #008f11;
+            margin-bottom: 20px;
+        }
+        /* 文件夹网格 */
+        .folder-wrap {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .folder-item {
+            border: 1px solid #00ff41;
+            padding: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .folder-item:hover {
+            background: #002200;
+        }
+        .folder-count {
+            color: #008f11;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+        /* 文件列表 */
+        .file-area {
+            margin-top: 20px;
+        }
+        .file-area h2 {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+        .file-item {
+            border: 1px solid #008f11;
+            padding: 6px 12px;
+            margin: 4px 0;
+            width: fit-content;
+            cursor: pointer;
+        }
+        .file-item:hover {
+            background: #002200;
+        }
+        .hide {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-<!-- ================= 配置区域 (JS部分) ================ -->
-<script>
-    // ⬇️⬇️⬇️ 请在这里填写你的 GitHub 信息 ⬇️⬇️⬇️
-    const GITHUB_CONFIG = {
-        user: "NE42HYJ1Z676", // <--- 这里有逗号
-        token: "github_pat_11BJQ4NVY0S83aaA0RmrIp_Ssa0g6FxYZgFTsTMSE1gXtq7HZuzKfcY9WQMz6Wd0vDJAC0E2UIqYFZ3...ODo...", // <--- 这里有逗号
-        path: 'mas_data.json' // <--- path 必须在花括号 { } 里面！
-    };
-    // <--- 封口的大括号和分号要放在最后
+    <h1>MAS档案库</h1>
+    <p class="tip">点击文件夹查看异常档案</p>
 
-    // 加上时间戳防止缓存
-    // 1. 定义获取数据的函数（用 async 包装，这样才可以用 await）
-    async function loadData() {
-        // 2. 加上时间戳防止缓存
-        const url = `${GITHUB_CONFIG.path}?t=${new Date().getTime()}`;
+    <div class="folder-wrap" id="folderContainer"></div>
+
+    <div class="file-area hide" id="fileBox">
+        <h2 id="nowFolder"></h2>
+        <div id="fileList"></div>
+    </div>
+
+<script>
+    const folderContainer = document.getElementById("folderContainer");
+    const fileBox = document.getElementById("fileBox");
+    const nowFolder = document.getElementById("nowFolder");
+    const fileList = document.getElementById("fileList");
+    let dirData = [];
+
+    // 【读取 dir.json 的核心函数】
+    async function initPage() {
         try {
-            // 3. 发送请求
-            const response = await fetch(url);
-            // 4. 检查是否成功
-            if (!response.ok) {
-                throw new Error('网络响应不正常');
-            }
-            // 5. 解析数据
-            const data = await response.json();
-            // 6. 【关键】打印数据到控制台（方便你看）
-            console.log("数据读取成功：", data);
-            // 7. 【关键】调用渲染函数，把数据显示在页面上！
-            renderData(data);
-        } catch (error) {
-            console.error("读取数据失败：", error);
+            const res = await fetch("dir.json");
+            dirData = await res.json();
+            renderFolders();
+        } catch (e) {
+            folderContainer.innerHTML = "<p>加载目录配置失败，请检查 dir.json 文件</p>";
         }
     }
-    // 8. 【关键】立即执行这个函数，否则代码不会跑
-    loadData();
-    // 处理数据
-</script>
 
-<!-- 顶部导航 -->
-<header>
-    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-    <h1>MAS 档案库</h1>
-    <!-- 原来的增加按钮 (+) 已被移除 -->
-</header>
-
-<!-- 侧边栏 -->
-<div id="sidebar">
-    <a href="#" class="sidebar-item active" onclick="filterCategory('all')">全部档案</a>
-    <a href="#" class="sidebar-item" onclick="filterCategory('物品异常')">物品异常</a>
-    <a href="#" class="sidebar-item" onclick="filterCategory('生物异常')">生物异常</a>
-    <a href="#" class="sidebar-item" onclick="filterCategory('人形异常')">人形异常</a>
-    <a href="#" class="sidebar-item" onclick="filterCategory('天体异常')">天体异常</a>
-    <a href="#" class="sidebar-item" onclick="filterCategory('气象异常')">气象异常</a>
-    <a href="#" class="sidebar-item" onclick="filterCategory('概念异常')">概念异常</a>
-    <a href="#" class="sidebar-item" onclick="filterCategory('人类异常')">人类异常</a>
-    <a href="#" class="sidebar-item" onclick="filterCategory('神性异常')">神性异常</a>
-</div>
-
-<div id="overlay" class="overlay" onclick="closeAllModals()"></div>
-
-<!-- 主内容 -->
-<div id="main-content">
-    <!-- 卡片将通过 JS 渲染在这里 -->
-</div>
-
-<!-- 编辑 模态框 (移除了新建档案的逻辑，只保留编辑) -->
-<div id="editModal" class="modal">
-    <h2 id="modalTitle">编辑档案</h2>
-    <!-- 移除了“异常编号”的输入框，因为不再需要生成新ID -->
-    <div class="form-group">
-        <label>异常名称</label>
-        <input type="text" id="inputName" placeholder="例如：不笑的娃娃">
-    </div>
-    <div class="form-group">
-        <label>档案创作者</label>
-        <input type="text" id="inputCreator" placeholder="你的网名">
-    </div>
-    <div class="form-group">
-        <label>发现宇宙</label>
-        <input type="text" id="inputUniverse" placeholder="例如：666 (禁止16和158)">
-    </div>
-    <div class="form-group">
-        <label>发现时间</label>
-        <input type="text" id="inputDate" placeholder="YYYY-MM-DD">
-    </div>
-    <div class="form-group">
-        <label>发现地点</label>
-        <input type="text" id="inputLocation" placeholder="例如：地下掩体B区">
-    </div>
-    <div class="form-group">
-        <label>发现者</label>
-        <input type="text" id="inputFinder" placeholder="可选">
-    </div>
-    <div class="form-group">
-        <label>异常等级</label>
-        <select id="inputLevel">
-            <option value="S级(安全)">S级 (安全)</option>
-            <option value="A级(实用)">A级 (实用)</option>
-            <option value="C级(可控)">C级 (可控)</option>
-            <option value="D级(神性)">D级 (神性/无威胁)</option>
-            <option value="P级(危险)">P级 (危险)</option>
-            <option value="R级(毁灭)">R级 (毁灭)</option>
-            <option value="M级(气象)">M级 (气象)</option>
-            <option value="I级(无形)">I级 (无形)</option>
-            <option value="E级(消逝)">E级 (消逝)</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>异常分类</label>
-        <select id="inputCategory">
-            <option value="物品异常">物品异常</option>
-            <option value="生物异常">生物异常</option>
-            <option value="人形异常">人形异常</option>
-            <option value="天体异常">天体异常</option>
-            <option value="气象异常">气象异常</option>
-            <option value="概念异常">概念异常</option>
-            <option value="人类异常">人类异常</option>
-            <option value="神性异常">神性异常</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label>简介 (一句话概括)</label>
-        <input type="text" id="inputSummary">
-    </div>
-    <div class="form-group">
-        <label>详细介绍 / 能力描述</label>
-        <textarea id="inputDescription" placeholder="在此输入详细信息..."></textarea>
-        <button class="btn" style="margin-top:5px; font-size:10px;" onclick="openFullEditor()">[全屏编辑详情]</button>
-    </div>
-    <div style="display:flex; justify-content: space-between; margin-top: 20px;">
-        <button class="btn" onclick="saveArchive()">保存档案</button>
-        <button class="btn btn-danger" onclick="closeAllModals()">取消</button>
-    </div>
-</div>
-
-<!-- 全屏编辑器模态框 -->
-<div id="fullEditorModal" class="modal">
-    <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2>全屏编辑详情</h2>
-        <button class="btn" onclick="closeFullEditor()">完成</button>
-    </div>
-    <textarea id="fullEditorTextarea"></textarea>
-</div>
-
-<script>
-    // ================= 数据与逻辑 =================
-    let archives = JSON.parse(localStorage.getItem('mas_archives')) || [];
-    let currentEditId = null;
-
-    // --- 初始化 ---
-    window.onload = () => {
-        renderList();
-    };
-
-    // --- 工具函数 ---
-    function saveData() {
-        localStorage.setItem('mas_archives', JSON.stringify(archives));
-        renderList();
-        // 尝试推送到 GitHub
-        pushToGitHub();
-    }
-
-    // --- 渲染与筛选 ---
-    function renderList(filter = 'all') {
-        const container = document.getElementById('main-content');
-        container.innerHTML = '';
-        const filtered = filter === 'all' ? archives : archives.filter(a => a.category === filter);
-        filtered.reverse().forEach(arc => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            card.innerHTML = `
-                <h3>${arc.name}</h3>
-                <p><strong>ID:</strong> ${arc.id}</p>
-                <p><strong>等级:</strong> <span class="tag">${arc.level}</span></p>
-                <p><strong>简介:</strong> ${arc.summary || '无'}</p>
-                <div class="card-actions">
-                    <button class="btn" onclick="editArchive('${arc.id}')">编辑</button>
-                    <button class="btn btn-danger" onclick="deleteArchive('${arc.id}')">删除</button>
-                </div>
+    // 渲染文件夹，并显示文件数量
+    function renderFolders() {
+        dirData.forEach(item => {
+            const folderDom = document.createElement("div");
+            folderDom.className = "folder-item";
+            folderDom.innerHTML = `
+                <div>📁 ${item.folderName}</div>
+                <div class="folder-count">共 ${item.files.length} 个文档</div>
             `;
-            container.appendChild(card);
+            folderDom.onclick = () => showFiles(item);
+            folderContainer.appendChild(folderDom);
         });
     }
 
-    // --- 交互逻辑 ---
-    function toggleSidebar() {
-        document.getElementById('sidebar').classList.toggle('active');
-        document.getElementById('overlay').classList.toggle('active');
+    // 展示当前文件夹下所有TXT文件
+    function showFiles(folderInfo) {
+        fileBox.classList.remove("hide");
+        nowFolder.innerText = `当前目录：${folderInfo.folderName}`;
+        fileList.innerHTML = "";
+
+        folderInfo.files.forEach(txt => {
+            const filePath = `${folderInfo.folderName}/${txt}`;
+            const fileDom = document.createElement("div");
+            fileDom.className = "file-item";
+            fileDom.innerText = `📄 ${txt}`;
+            fileDom.onclick = () => openTxt(filePath);
+            fileList.appendChild(fileDom);
+        });
     }
 
-    // 移除了 openAddModal 函数，不再提供新建功能
-
-    function editArchive(id) {
-        const arc = archives.find(a => a.id === id);
-        if (!arc) return;
-        currentEditId = id;
-        document.getElementById('modalTitle').innerText = '编辑档案: ' + arc.id;
-        // 移除了 ID 输入框的赋值逻辑
-        document.getElementById('inputName').value = arc.name;
-        document.getElementById('inputCreator').value = arc.creator;
-        document.getElementById('inputUniverse').value = arc.universe;
-        document.getElementById('inputDate').value = arc.date;
-        document.getElementById('inputLocation').value = arc.location;
-        document.getElementById('inputFinder').value = arc.finder;
-        document.getElementById('inputLevel').value = arc.level;
-        document.getElementById('inputCategory').value = arc.category;
-        document.getElementById('inputSummary').value = arc.summary;
-        document.getElementById('inputDescription').value = arc.description;
-        document.getElementById('editModal').classList.add('active');
-        document.getElementById('overlay').classList.add('active');
+    // 新标签页打开TXT，黑底绿字保留原文
+    function openTxt(filePath) {
+        const newPage = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body {
+    background: #000;
+    color: #00ff41;
+    font-family: "Courier New", monospace;
+    padding: 20px;
+    white-space: pre-wrap;
+    font-size: 14px;
+}
+</style>
+</head>
+<body>
+<script>
+fetch("${filePath}")
+.then(res => res.text())
+.then(text => document.body.textContent = text)
+.catch(() => document.body.textContent = "文件读取失败");
+<\/script>
+</body>
+</html>`;
+        const win = window.open("", "_blank");
+        win.document.write(newPage);
+        win.document.close();
     }
 
-    function deleteArchive(id) {
-        if (confirm('确定要删除该档案吗？此操作不可恢复！')) {
-            archives = archives.filter(a => a.id !== id);
-            saveData();
-        }
-    }
-
-    function saveArchive() {
-        // 在保存时，不再生成新的 ID，而是保留原有的 ID
-        const updatedArchive = {
-            id: currentEditId, // 直接使用当前编辑的 ID
-            name: document.getElementById('inputName').value,
-            creator: document.getElementById('inputCreator').value,
-            universe: document.getElementById('inputUniverse').value,
-            date: document.getElementById('inputDate').value,
-            location: document.getElementById('inputLocation').value,
-            finder: document.getElementById('inputFinder').value,
-            level: document.getElementById('inputLevel').value,
-            category: document.getElementById('inputCategory').value,
-            summary: document.getElementById('inputSummary').value,
-            description: document.getElementById('inputDescription').value
-        };
-
-        if (!updatedArchive.name) {
-            alert('请输入异常名称');
-            return;
-        }
-
-        // 更新数组
-        const index = archives.findIndex(a => a.id === currentEditId);
-        if (index !== -1) {
-            archives[index] = updatedArchive;
-        }
-
-        saveData();
-        closeAllModals();
-    }
-
-    function closeAllModals() {
-        document.getElementById('editModal').classList.remove('active');
-        document.getElementById('fullEditorModal').classList.remove('active');
-        document.getElementById('sidebar').classList.remove('active');
-        document.getElementById('overlay').classList.remove('active');
-    }
-
-    function filterCategory(cat) {
-        renderList(cat);
-        closeAllModals();
-    }
-
-    // --- 全屏编辑功能 ---
-    function openFullEditor() {
-        const text = document.getElementById('inputDescription').value;
-        document.getElementById('fullEditorTextarea').value = text;
-        document.getElementById('fullEditorModal').classList.add('active');
-    }
-
-    function closeFullEditor() {
-        const text = document.getElementById('fullEditorTextarea').value;
-        document.getElementById('inputDescription').value = text;
-        document.getElementById('fullEditorModal').classList.remove('active');
-    }
-
-    // ================= GitHub 同步功能 =================
-    async function pushToGitHub() {
-        // 检查配置是否填写
-        if (GITHUB_CONFIG.token === '这里填你的令牌(ghp_...)') {
-            console.log('GitHub Token 未配置，仅保存到本地');
-            return;
-        }
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.user}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.path}`;
-        // 1. 先获取文件的 SHA (如果是更新)
-        let sha = null;
-        try {
-            const getRes = await fetch(url, {
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`
-                }
-            });
-            if (getRes.ok) {
-                const data = await getRes.json();
-                sha = data.sha;
-            }
-        } catch (e) {
-            console.error('获取文件SHA失败', e);
-        }
-        // 2. 上传/更新文件
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(archives, null, 2)))); // Base64编码
-        const body = {
-            message: "Update MAS Archives via Web App",
-            content: content,
-            sha: sha
-        };
-        try {
-            const putRes = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            });
-            if (putRes.ok) {
-                console.log('成功同步到 GitHub!');
-            } else {
-                const err = await putRes.json();
-                console.error('GitHub 同步失败:', err.message);
-                alert('本地保存成功，但同步到GitHub失败: ' + err.message);
-            }
-        } catch (e) {
-            console.error('网络错误', e);
-        }
-    }
+    window.onload = initPage;
 </script>
 </body>
 </html>
